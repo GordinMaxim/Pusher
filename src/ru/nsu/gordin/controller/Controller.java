@@ -3,11 +3,15 @@ package ru.nsu.gordin.controller;
 import ru.nsu.gordin.PusherException;
 import ru.nsu.gordin.model.*;
 import ru.nsu.gordin.score.Score;
-import ru.nsu.gordin.score.Timer;
+import ru.nsu.gordin.score.Table;
 import ru.nsu.gordin.viewer.View;
 import ru.nsu.gordin.viewer.ViewInterface;
 
+
 import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -25,6 +29,7 @@ public class Controller extends KeyAdapter implements ControllerInterface{
     private ViewInterface view;
     private Timer timer;
     private Score score;
+    private Table table;
 
     private Controller(){}
 
@@ -35,12 +40,19 @@ public class Controller extends KeyAdapter implements ControllerInterface{
 
     public void run()
     {
-        view = new View(this, model);
+        table = new Table();
+        try {
+            view = new View(this, model);
+        }
+        catch (PusherException e)
+        {
+            e.printStackTrace();
+            view.printError(e.getMessage());
+        }
         view.createMenuBar();
         view.setStartPanel();
         view.addKeyListener(this);
     }
-
 
     public void startGame()
     {
@@ -56,12 +68,38 @@ public class Controller extends KeyAdapter implements ControllerInterface{
         int width = model.getWidth();
         int height = model.getHeight();
         view.setGameFieldSize(width * 50, height * 50);
+
         score = new Score();
         score.start();
-        timer = new Timer(view, score);
 
-//        не работает, не разобрался как правильно
-//        SwingUtilities.invokeLater(timer);
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                view.updateInfoPanel(score);
+            }
+        });
+        timer.start();
+    }
+
+    public void endGame(String user)
+    {
+        long time = score.getTime();
+        int steps = score.getStepNumber();
+        timer.stop();
+
+        String level = model.getLevel();
+        table.addRecord(level, user, time, steps);
+        view.setStartPanel();
+    }
+
+    public Object[][] getTable()
+    {
+        return table.getTable();
+    }
+
+    public Object[] getColumns()
+    {
+        return new String[]{"level", "name", "time", "steps"};
     }
 
     public boolean initModel(String gameFile) {
@@ -88,25 +126,25 @@ public class Controller extends KeyAdapter implements ControllerInterface{
                 case KeyEvent.VK_UP :
                 {
                     System.out.println("UP");
-                    model.move(Directions.UP);
+                    model.move(Directions.UP, score);
                     break;
                 }
                 case KeyEvent.VK_DOWN :
                 {
                     System.out.println("DOWN");
-                    model.move(Directions.DOWN);
+                    model.move(Directions.DOWN, score);
                     break;
                 }
                 case KeyEvent.VK_LEFT :
                 {
                     System.out.println("LEFT");
-                    model.move(Directions.LEFT);
+                    model.move(Directions.LEFT, score);
                     break;
                 }
                 case KeyEvent.VK_RIGHT :
                 {
                     System.out.println("RIGHT");
-                    model.move(Directions.RIGHT);
+                    model.move(Directions.RIGHT, score);
                     break;
                 }
             }

@@ -12,4 +12,7 @@ public interface ControllerInterface {
     public void run();
     public boolean initModel(String gameFile);
     public void startGame();
+    public void endGame(String user);
+    public Object[][] getTable();
+    public Object[] getColumns();
 }

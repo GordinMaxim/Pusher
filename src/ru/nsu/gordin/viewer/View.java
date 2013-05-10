@@ -1,7 +1,9 @@
 package ru.nsu.gordin.viewer;
 
+import ru.nsu.gordin.PusherException;
 import ru.nsu.gordin.controller.ControllerInterface;
 import ru.nsu.gordin.model.AbstractModel;
+import ru.nsu.gordin.model.Model;
 import ru.nsu.gordin.model.ModelComponent;
 import ru.nsu.gordin.score.Score;
 import ru.nsu.gordin.viewer.levelmvc.GameListModel;
@@ -26,7 +28,7 @@ import java.util.Observer;
 // что лучше, когда View реализует ActionListener(тогда все элементы интерфейса должны быть полями)
 // или когда на каждый элемент свой анонимный или внутренний класс?
 public class View implements ViewInterface, Observer {
-    private AbstractModel model;
+    private Model model;
     private ControllerInterface controller;
     private JFrame frame;
     private JPanel panel;
@@ -36,6 +38,7 @@ public class View implements ViewInterface, Observer {
     ModelComponent modelComponent;
     private JMenuBar menuBar;
     private JComboBox<String> comboBox;
+
 
     private View(){
         frame = new JFrame();
@@ -51,12 +54,15 @@ public class View implements ViewInterface, Observer {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    public View(ControllerInterface controller,  AbstractModel model)
+    public View(ControllerInterface controller,  AbstractModel model) throws PusherException
     {
         this();
-        this.model = model;
+        this.model = (Model)model;
+        if(null == this.model)
+            throw new PusherException("AbstractModel model must reference to Model");
+
         this.controller = controller;
-        model.addObserver(this);
+        this.model.addObserver(this);
     }
 
     public void setGameFieldSize(int width, int height)
@@ -69,7 +75,7 @@ public class View implements ViewInterface, Observer {
     public void createMenuBar()
     {
         JMenu game, help;
-        JMenuItem newGame, loadGameFromFile;
+        JMenuItem newGame;
         JMenuItem tutorial, about;
 
         game = new JMenu("Game");
@@ -92,16 +98,6 @@ public class View implements ViewInterface, Observer {
         });
         newGame.setAccelerator(KeyStroke.getKeyStroke(MenuKeyEvent.VK_F2, 0));
         game.add(newGame);
-
-        loadGameFromFile = new JMenuItem("Load game from file");
-        loadGameFromFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //open file dialog
-            }
-        });
-        game.add(loadGameFromFile);
-
 
         tutorial = new JMenuItem("Tutorial");
         tutorial.addActionListener(new ActionListener() {
@@ -146,6 +142,10 @@ public class View implements ViewInterface, Observer {
         });
         midPanel.add(/*BorderLayout.EAST,*/ button);
 
+        panel.add(BorderLayout.SOUTH, new JTable(controller.getTable(), controller.getColumns()));
+
+        JTable table = new JTable();
+
         return;
     }
 
@@ -160,6 +160,8 @@ public class View implements ViewInterface, Observer {
         scorePanel.setLayout(new GridLayout(2, 1));
         scorePanel.add(new JLabel("Time: " + score.getTime()));
         scorePanel.add(new JLabel("Steps: " + score.getStepNumber()));
+        scorePanel.revalidate();
+        scorePanel.repaint();
     }
 
     void setInfoPanel()
@@ -206,16 +208,15 @@ public class View implements ViewInterface, Observer {
     @Override
     public void update(Observable o, Object arg) {
         System.out.println("update");
+        gamePanel.revalidate();
+        gamePanel.repaint();
 
         if(model.check())
         {
             System.out.println("WIN!");
-//            endGameAndRecovery(true);
+            String username = JOptionPane.showInputDialog(frame, "You win. Enter your name:");
+            System.out.println(username);
+            controller.endGame(username);
         }
-
-        panel.revalidate();
-        panel.repaint();
-        frame.revalidate();
-        frame.repaint();
     }
 }

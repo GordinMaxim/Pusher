@@ -13,7 +13,7 @@ import java.awt.event.KeyListener;
  */
 
 public interface ViewInterface {
-    public static int widthInfoPanel = 100;
+    public final static int widthInfoPanel = 100;
     public void createMenuBar();
     public void setStartPanel();
     public void updateInfoPanel(Score score);

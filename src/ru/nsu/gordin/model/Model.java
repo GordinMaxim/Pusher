@@ -2,17 +2,20 @@ package ru.nsu.gordin.model;
 
 import org.apache.log4j.Logger;
 import ru.nsu.gordin.PusherException;
+import ru.nsu.gordin.score.Score;
 
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Observable;
 
-public class Model  extends AbstractModel {
+public class Model extends Observable implements AbstractModel {
     public static final int HEIGHT_INIT = 100;
     final Logger log = Logger.getLogger(Model.class);
 
+    private String level;
     private int goalCount;
     private int goalNumber;
     private int width;
@@ -62,6 +65,13 @@ public class Model  extends AbstractModel {
                 throw new PusherException("should be the same number of boxes and goals");
             }
         }
+
+        level = fileName;
+    }
+
+    public String getLevel()
+    {
+        return level;
     }
 
     private boolean changeCoordinates(Dimension dim, Directions d)
@@ -96,7 +106,7 @@ public class Model  extends AbstractModel {
         return true;
     }
 
-    public void move(Directions d) throws PusherException
+    public void move(Directions d, Score score) throws PusherException
     {
         Dimension next = new Dimension(posY, posX);
 
@@ -137,6 +147,7 @@ public class Model  extends AbstractModel {
 
         posY = next.width;
         posX = next.height;
+        score.incrementStep();
         setChanged();
         notifyObservers();
         return;

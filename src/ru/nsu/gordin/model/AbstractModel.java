@@ -1,6 +1,7 @@
 package ru.nsu.gordin.model;
 
 import ru.nsu.gordin.PusherException;
+import ru.nsu.gordin.score.Score;
 
 import java.io.IOException;
 import java.util.Observable;
@@ -13,12 +14,13 @@ import java.util.Observable;
  * To change this template use File | Settings | File Templates.
  */
 
-abstract public class AbstractModel extends Observable {
-    abstract public void init(String fileName) throws IOException, PusherException;
-    abstract public void move(Directions d) throws PusherException;
-    abstract public boolean check();
-    abstract public int getX();
-    abstract public int getY();
-    abstract public int getWidth();
-    abstract public int getHeight();
+public interface AbstractModel {
+    public void init(String fileName) throws IOException, PusherException;
+    public void move(Directions d, Score score) throws PusherException;
+    public boolean check();
+    public int getX();
+    public int getY();
+    public int getWidth();
+    public int getHeight();
+    public String getLevel();
 }
