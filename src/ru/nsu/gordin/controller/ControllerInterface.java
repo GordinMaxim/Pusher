@@ -1,5 +1,7 @@
 package ru.nsu.gordin.controller;
 
+import javax.swing.table.TableModel;
+
 /**
  * Created with IntelliJ IDEA.
  * User: gormakc
@@ -13,6 +15,6 @@ public interface ControllerInterface {
     public boolean initModel(String gameFile);
     public void startGame();
     public void endGame(String user);
-    public Object[][] getTable();
+    public TableModel getTableModel();
     public Object[] getColumns();
 }

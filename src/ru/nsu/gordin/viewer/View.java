@@ -10,6 +10,8 @@ import ru.nsu.gordin.viewer.levelmvc.GameListModel;
 
 import javax.swing.*;
 import javax.swing.event.MenuKeyEvent;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,7 +105,12 @@ public class View implements ViewInterface, Observer {
         tutorial.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //open tutorial
+                JDialog tutorial = new JDialog();
+                tutorial.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+                JLabel text = new JLabel("tutorial");
+                tutorial.getContentPane().add(text);
+                tutorial.pack();
+                tutorial.setVisible(true);
             }
         });
         help.add(tutorial);
@@ -112,7 +119,12 @@ public class View implements ViewInterface, Observer {
         about.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //open about
+                JDialog about = new JDialog();
+                about.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+                JLabel text = new JLabel("about");
+                about.getContentPane().add(text);
+                about.pack();
+                about.setVisible(true);
             }
         });
         help.add(about);
@@ -142,7 +154,7 @@ public class View implements ViewInterface, Observer {
         });
         midPanel.add(/*BorderLayout.EAST,*/ button);
 
-        panel.add(BorderLayout.SOUTH, new JTable(controller.getTable(), controller.getColumns()));
+        panel.add(BorderLayout.SOUTH, new JTable(controller.getTableModel()));
 
         JTable table = new JTable();
 

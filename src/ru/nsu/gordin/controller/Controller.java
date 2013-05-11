@@ -92,9 +92,9 @@ public class Controller extends KeyAdapter implements ControllerInterface{
         view.setStartPanel();
     }
 
-    public Object[][] getTable()
+    public TableModel getTableModel()
     {
-        return table.getTable();
+        return table;
     }
 
     public Object[] getColumns()
